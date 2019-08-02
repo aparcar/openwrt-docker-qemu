@@ -1,0 +1,21 @@
+version: 2.0
+jobs:
+  testbuild:
+    docker:
+      - image: tianon/qemu
+    environment:
+      QEMU_HDA: "/tmp/hda.img"
+      QEMU_NO_SERIAL: 1
+      ROOTFS_URL: https://downloads.openwrt.org/snapshots/targets/x86/64/openwrt-x86-64-combined-squashfs.img.gz
+    steps:
+      - run: apt update && apt install wget -y
+      - run: wget "$ROOTFS_URL" -O /tmp/hda.img.gz
+      - run: gzip -d /tmp/hda.img.gz
+      - run: start-qemu -nographic
+      - run: cat /etc/lsb_release
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - testbuild
